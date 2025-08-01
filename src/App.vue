@@ -386,10 +386,8 @@ export default {
       return cart.value.reduce((total, item) => total + item.quantity, 0);
     });
     
-    // 路由
     const router = useRouter();
     
-    // 方法
     const handleSearch = () => {
       if (searchQuery.value) {
         router.push({ path: '/search', query: { q: searchQuery.value } });
@@ -457,6 +455,7 @@ export default {
       const box = blindBoxes.value.find(b => b.id === boxId);
       if (!box) return;
       
+      // 随机选择
       const random = Math.random();
       let selectedItem;
       
@@ -485,6 +484,17 @@ export default {
         openLoginModal();
         return;
       }
+      
+      const exists = userCollections.value.some(
+        col => col.id === item.id && col.boxId === item.boxId
+      );
+      
+      if (!exists) {
+        userCollections.value.push(item);
+        alert('已添加到收藏！');
+      } else {
+        alert('该物品已在收藏中');
+      }
     };
     
     const removeFromCollection = (itemId, boxId) => {
@@ -499,7 +509,6 @@ export default {
         return;
       }
       
-      // 添加到玩家秀
       showcaseItems.value.unshift({
         id: Date.now(),
         image: item.image,
@@ -519,7 +528,6 @@ export default {
       });
     });
     
-    // 监听路由变化，关闭移动菜单
     watch(
       () => router.currentRoute.value,
       () => {
@@ -908,10 +916,5 @@ export default {
 
 .animate-unbox {
   animation: unbox 1.5s ease-out forwards;
-}
-
-/* 滚动条隐藏 */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
 }
 </style>

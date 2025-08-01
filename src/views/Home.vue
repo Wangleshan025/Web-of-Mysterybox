@@ -3,7 +3,7 @@
     <!-- 英雄区域 -->
     <section class="hero-section">
       <div class="hero-content">
-        <h1>开启神秘神秘盲盒，收藏专属惊喜</h1>
+        <h1>开启神秘盲盒，收藏专属惊喜</h1>
         <p>每一款盲盒都藏着独一无二的惊喜，快来开启属于你的神秘世界</p>
         <div class="hero-buttons">
           <button @click="$router.push('/collections')" class="primary-btn">
@@ -21,7 +21,7 @@
       </div>
     </section>
 
-    <!-- 特色区域 -->
+    <!-- 特色区域 - 三个模块横向排列 -->
     <section class="features-section">
       <div class="section-header">
         <h2>为什么选择我们</h2>
@@ -29,21 +29,21 @@
       </div>
       
       <div class="features-grid">
-        <span class="feature-card">
+        <div class="feature-card">
           <div class="feature-icon">
             <i class="fa fa-gift"></i>
           </div>
           <h3>独家设计</h3>
           <p>每款盲盒都由专业设计师精心打造，独一无二</p>
-        </span>
+        </div>
         
-        <span class="feature-card">
+        <div class="feature-card">
           <div class="feature-icon">
             <i class="fa fa-star"></i>
           </div>
           <h3>隐藏款惊喜</h3>
           <p>每一系列都有超稀有隐藏款，考验你的运气</p>
-        </span>
+        </div>
         
         <div class="feature-card">
           <div class="feature-icon">
@@ -87,7 +87,7 @@
               @click.stop="handleAddToCart(box.id)" 
               class="add-to-cart-btn"
             >
-              🛒
+              加入购物车
             </button>
           </div>
         </div>
@@ -113,7 +113,7 @@
           <img :src="item.image" :alt="item.caption" class="showcase-image">
           <div class="showcase-info">
             <p class="showcase-caption">{{ item.caption }}</p>
-            <div>
+            <div class="showcase-likes">
               <i class="fa fa-heart"></i>
               <span>{{ item.likes }}</span>
             </div>
@@ -184,14 +184,17 @@ export default {
   --light-gray: #f3f4f6;
   --medium-gray: #9ca3af;
   --dark-gray: #4b5563;
+  
+  /* 统一的背景透明度变量 */
+  --section-bg-opacity: 0.13;
 }
 
-/* 首页容器 */
-.home-container {
-  width: 100%;
-  overflow-x: hidden;
+/* 统一设置所有section的基础样式 */
+.home-container section {
+  transition: background-color 0.3s ease;
 }
 
+/* 按钮样式 */
 .primary-btn {
   background-color: var(--primary-color);
   color: white;
@@ -243,14 +246,14 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 4rem 1rem;
-  background-color: var(--light-gray);
+  background-color: rgba(243, 244, 246, calc(var(--section-bg-opacity) * 5));
   overflow: hidden;
   position: relative;
+  margin-top: 50px;
 }
 
 @media (min-width: 768px) {
   .hero-section {
-    margin-top: 50px;
     flex-direction: row;
     align-items: center;
     padding: 6rem 2rem;
@@ -401,28 +404,29 @@ export default {
   margin-bottom: 1rem;
 }
 
+/* 特色区域 - 三个模块横向排列 */
 .features-section {
   padding: 4rem 1rem;
+  background-color: rgba(255, 255, 255, var(--section-bg-opacity));
 }
 
 .features-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
+  display: flex;
+  gap: 1.5rem;
   max-width: 1200px;
   margin: 0 auto;
-}
-
-@media (min-width: 768px) {
-  .features-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  flex-wrap: nowrap;
 }
 
 .feature-card {
+  flex: 1;
+  min-width: 250px;
   background-color: white;
   border-radius: 1rem;
-  padding: 2rem;
+  padding: 2rem 1.5rem;
   text-align: center;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
@@ -455,12 +459,13 @@ export default {
 .feature-card p {
   color: var(--dark-gray);
   font-size: 0.875rem;
+  line-height: 1.6;
 }
 
 /* 热门盲盒区域 */
 .popular-section {
   padding: 4rem 1rem;
-  background-color: var(--light-gray);
+  background-color: rgba(243, 244, 246, calc(var(--section-bg-opacity) * 3));
 }
 
 .boxes-grid {
@@ -558,7 +563,6 @@ export default {
   border-radius: 0.5rem;
   padding: 0.5rem;
   font-weight: 500;
-  font-size: large;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
@@ -567,8 +571,10 @@ export default {
   background-color: var(--primary-color-light);
 }
 
+/* 玩家秀区域 */
 .showcase-section {
   padding: 4rem 1rem;
+  background-color: rgba(255, 255, 255, var(--section-bg-opacity));
 }
 
 .showcase-grid {
@@ -617,6 +623,13 @@ export default {
   font-size: 0.875rem;
   color: var(--dark-gray);
   margin-bottom: 0.5rem;
+}
+
+.showcase-likes {
+  display: flex;
+  align-items: center;
+  color: #ef4444;
+  font-size: 0.875rem;
 }
 
 .showcase-likes i {
