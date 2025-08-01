@@ -76,7 +76,151 @@
     
 
     
-
+    <!-- 登录模态框 -->
+    <div v-if="loginModalOpen" class="result-modal">
+      <div class="modal-content">
+        <div class="result-container">
+          <!-- 修改关闭按钮位置到左上角 -->
+          <button @click="loginModalOpen = false" class="text-gray-400 hover:text-gray-600 close-icon login-close-btn">
+            <i class="fa fa-times text-xl"></i>
+          </button>
+          
+          <div class="login-title-container">
+            <h3 class="text-2xl font-bold">{{ loginMode === 'login' ? '用户登录' : '用户注册' }}</h3>
+          </div>
+          
+          <form @submit.prevent="handleAuth">
+            <!-- 表单表单内容保持不变 -->
+            <div v-if="loginMode === 'register'" class="mb-4">
+              <label class="block text-gray-700 mb-2" for="username">用户名</label>
+              <input 
+                type="text" 
+                id="username" 
+                v-model="authForm.username"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                placeholder="请输入用户名"
+                required
+              >
+            </div>
+            
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2" for="email">邮箱</label>
+              <input 
+                type="email" 
+                id="email" 
+                v-model="authForm.email"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                placeholder="请输入邮箱"
+                required
+              >
+            </div>
+            
+            <div class="mb-6">
+              <label class="block text-gray-700 mb-2" for="password">密码</label>
+              <input 
+                type="password" 
+                id="password" 
+                v-model="authForm.password"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                placeholder="请输入密码"
+                required
+              >
+              <div v-if="loginMode === 'login'" class="flex justify-end mt-2">
+                <a href="#" class="text-primary text-sm hover:underline">忘记密码？</a>
+              </div>
+            </div>
+            
+            <button 
+              type="submit" 
+              class="w-full action-btn primary-btn mb-4"
+            >
+              {{ loginMode === 'login' ? '登录' : '注册' }}
+            </button>
+            
+            <div class="text-center mb-4">
+              <p class="text-gray-600">
+                {{ loginMode === 'login' ? '还没有账号？' : '已有账号？' }}
+                <button 
+                  type="button" 
+                  @click="toggleAuthMode"
+                  class="text-primary font-medium hover:underline"
+                >
+                  {{ loginMode === 'login' ? '立即注册' : '立即登录' }}
+                </button>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 盲盒开启结果模态框 -->
+    <div 
+      v-if="boxResultOpen" 
+      class="result-modal"
+    >
+      <div class="modal-content">
+        <div class="result-container">
+          <!-- 稀有度徽章 -->
+          <div 
+            class="rarity-badge" 
+            :class="currentBoxResult.isHidden ? 'rarity-legendary' : 'rarity-rare'"
+          >
+            {{ currentBoxResult.isHidden ? '隐藏款' : '普通款' }}
+          </div>
+          
+          <div class="item-display">
+            <div style="
+              width: 10rem;
+              height: 10rem;
+              margin: 0 auto 1.5rem;
+              background-color: #f3f4f6;
+              border-radius: 0.75rem;
+              overflow: hidden;
+            ">
+              <img 
+                :src="currentBoxResult.image" 
+                alt="盲盒结果" 
+                style="width: 100%; height: 100%; object-fit: cover;"
+                class="animate-unbox"
+              >
+            </div>
+            
+            <h3 id="item-name" style="font-size: 1.25rem; font-weight: bold;">
+              {{ currentBoxResult.name }}
+            </h3>
+            
+            <p v-if="currentBoxResult.isHidden" class="legendary-label">
+              <i class="fa fa-star"></i> 太幸运了！抽到隐藏款！
+            </p>
+          </div>
+          
+          <!-- 功能按钮 -->
+          <div style="display: flex; gap: 1rem; margin: 1.5rem 0;">
+            <button 
+              @click="addToCollection(currentBoxResult)"
+              class="action-btn primary-btn"
+            >
+              <i class="fa fa-plus mr-2"></i> 加入收藏
+            </button>
+            <button 
+              @click="shareShowcase(currentBoxResult)"
+              class="action-btn secondary-btn"
+            >
+              <i class="fa fa-share-alt mr-2"></i> 分享
+            </button>
+          </div>
+          
+          <button 
+            @click="boxResultOpen = false"
+            id="close-result" 
+            class="close-btn"
+          >
+            关闭
+          </button>
+        </div>
+      </div>
+    </div>
     <!-- 页脚 -->
     <hr color="indigo" size="4px" style="margin-top: 15px;">
     <footer>
@@ -133,6 +277,24 @@ import { useRouter } from 'vue-router';
 export default {
   name: 'App',
   setup() {
+    // 状态管理
+    const scrolled = ref(false);
+    const mobileMenuOpen = ref(false);
+    const searchQuery = ref('');
+    const loginModalOpen = ref(false);
+    const loginMode = ref('login'); // 'login' 或 'register'
+    const isLoggedIn = ref(false);
+    const userAvatar = ref('https://picsum.photos/id/64/200/200');
+    const boxResultOpen = ref(false);
+    const currentBoxResult = ref(null);
+    
+    // 表单数据
+    const authForm = ref({
+      username: '',
+      email: '',
+      password: ''
+    });
+    
     // 应用数据
     const blindBoxes = ref([
       {
@@ -210,8 +372,24 @@ export default {
       { id: 6, image: 'https://picsum.photos/id/116/300/300', likes: 103, caption: '最喜欢这个角色了' }
     ]);
     
+    // 计算属性
+    const filteredBlindBoxes = computed(() => {
+      if (!searchQuery.value) return blindBoxes.value;
+      const query = searchQuery.value.toLowerCase();
+      return blindBoxes.value.filter(box => 
+        box.name.toLowerCase().includes(query) || 
+        box.description.toLowerCase().includes(query)
+      );
+    });
+    
+    const cartCount = computed(() => {
+      return cart.value.reduce((total, item) => total + item.quantity, 0);
+    });
+    
+    // 路由
     const router = useRouter();
     
+    // 方法
     const handleSearch = () => {
       if (searchQuery.value) {
         router.push({ path: '/search', query: { q: searchQuery.value } });
@@ -289,11 +467,9 @@ export default {
         selectedItem = normalItems[Math.floor(Math.random() * normalItems.length)];
       }
       
-      // 记录结果
       currentBoxResult.value = { ...selectedItem, boxId: box.id, boxName: box.name };
       boxResultOpen.value = true;
       
-      // 添加到订单
       userOrders.value.push({
         id: Date.now(),
         boxId: box.id,
@@ -309,18 +485,30 @@ export default {
         openLoginModal();
         return;
       }
-      
-      // 检查是否已在收藏中
-      const exists = userCollections.value.some(
-        col => col.id === item.id && col.boxId === item.boxId
+    };
+    
+    const removeFromCollection = (itemId, boxId) => {
+      userCollections.value = userCollections.value.filter(
+        item => !(item.id === itemId && item.boxId === boxId)
       );
-      
-      if (!exists) {
-        userCollections.value.push(item);
-        alert('已添加到收藏！');
-      } else {
-        alert('该物品已在收藏中');
+    };
+    
+    const shareShowcase = (item) => {
+      if (!isLoggedIn.value) {
+        openLoginModal();
+        return;
       }
+      
+      // 添加到玩家秀
+      showcaseItems.value.unshift({
+        id: Date.now(),
+        image: item.image,
+        likes: 0,
+        caption: `我抽到了${item.name}！#${item.boxName}#`
+      });
+      
+      alert('分享成功！');
+      boxResultOpen.value = false;
     };
     
     // 生命周期钩子
@@ -330,6 +518,14 @@ export default {
         scrolled.value = window.scrollY > 50;
       });
     });
+    
+    // 监听路由变化，关闭移动菜单
+    watch(
+      () => router.currentRoute.value,
+      () => {
+        mobileMenuOpen.value = false;
+      }
+    );
     
     return {
       scrolled,
@@ -609,6 +805,52 @@ export default {
   font-weight: 500;
   margin-top: 0.25rem;
   text-shadow: 0 0 5px rgba(243, 156, 18, 0.3);
+}
+
+.action-btn {
+  flex: 1;
+  padding: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.primary-btn {
+  background-color: #3498db;
+  color: white;
+}
+
+.primary-btn:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+}
+
+.secondary-btn {
+  background-color: #9b59b6;
+  color: white;
+}
+
+.secondary-btn:hover {
+  background-color: #8e44ad;
+  transform: translateY(-2px);
+}
+
+.close-btn {
+  margin-top: 1rem;
+  padding: 10px 30px;
+  background: #ecf0f1;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: #dcdde1;
+  transform: translateY(-2px);
 }
 
 .result-container {

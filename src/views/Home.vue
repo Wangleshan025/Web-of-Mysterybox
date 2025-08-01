@@ -21,6 +21,40 @@
       </div>
     </section>
 
+    <!-- 特色区域 -->
+    <section class="features-section">
+      <div class="section-header">
+        <h2>为什么选择我们</h2>
+        <p>精选优质盲盒，带给你不一样的收藏体验</p>
+      </div>
+      
+      <div class="features-grid">
+        <span class="feature-card">
+          <div class="feature-icon">
+            <i class="fa fa-gift"></i>
+          </div>
+          <h3>独家设计</h3>
+          <p>每款盲盒都由专业设计师精心打造，独一无二</p>
+        </span>
+        
+        <span class="feature-card">
+          <div class="feature-icon">
+            <i class="fa fa-star"></i>
+          </div>
+          <h3>隐藏款惊喜</h3>
+          <p>每一系列都有超稀有隐藏款，考验你的运气</p>
+        </span>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa fa-shield"></i>
+          </div>
+          <h3>正品保障</h3>
+          <p>所有产品均为正品，质量保证，放心收藏</p>
+        </div>
+      </div>
+    </section>
+
     <!-- 热门盲盒区域 -->
     <section class="popular-section">
       <div class="section-header">
@@ -43,9 +77,9 @@
             <span v-if="box.tag" class="box-tag">{{ box.tag }}</span>
           </div>
           <div class="box-info">
-            <h3>{{ box.name }}</h3>
+            <h3 class="box-name">{{ box.name }}</h3>
             <p class="box-price">¥{{ box.price }}</p>
-            <div>
+            <div class="box-popularity">
               <i class="fa fa-fire"></i>
               <span>{{ box.popularity }}% 人气</span>
             </div>
@@ -53,8 +87,36 @@
               @click.stop="handleAddToCart(box.id)" 
               class="add-to-cart-btn"
             >
-              加入购物车
+              🛒
             </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 玩家秀区域 -->
+    <section class="showcase-section">
+      <div class="section-header">
+        <h2>玩家秀</h2>
+        <p>看看其他玩家抽到了什么惊喜</p>
+        <button @click="$router.push('/showcase')" class="view-all-btn">
+          查看更多 <i class="fa fa-arrow-right ml-1"></i>
+        </button>
+      </div>
+      
+      <div class="showcase-grid">
+        <div 
+          v-for="item in featuredShowcase" 
+          :key="item.id" 
+          class="showcase-item"
+        >
+          <img :src="item.image" :alt="item.caption" class="showcase-image">
+          <div class="showcase-info">
+            <p class="showcase-caption">{{ item.caption }}</p>
+            <div>
+              <i class="fa fa-heart"></i>
+              <span>{{ item.likes }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -86,6 +148,11 @@ export default {
         .slice(0, 4);
     });
     
+    // 精选玩家秀（取前6个）
+    const featuredShowcase = computed(() => {
+      return props.showcaseItems.slice(0, 6);
+    });
+    
     // 加入购物车
     const handleAddToCart = (boxId) => {
       emit('add-to-cart', boxId);
@@ -93,6 +160,7 @@ export default {
     
     return {
       popularBoxes,
+      featuredShowcase,
       handleAddToCart
     };
   }
@@ -124,7 +192,6 @@ export default {
   overflow-x: hidden;
 }
 
-/* 按钮样式 */
 .primary-btn {
   background-color: var(--primary-color);
   color: white;
@@ -183,6 +250,7 @@ export default {
 
 @media (min-width: 768px) {
   .hero-section {
+    margin-top: 50px;
     flex-direction: row;
     align-items: center;
     padding: 6rem 2rem;
@@ -247,7 +315,7 @@ export default {
 .hero-image {
   flex: 1;
   position: relative;
-  height: 100px;
+  height: 300px;
 }
 
 @media (min-width: 768px) {
@@ -261,6 +329,7 @@ export default {
   height: 100%;
   object-fit: cover;
   border-radius: 1rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 .decor-image {
@@ -275,6 +344,7 @@ export default {
   height: 150px;
   top: -20px;
   right: 20px;
+  border: 4px solid white;
 }
 
 @media (min-width: 768px) {
@@ -288,9 +358,10 @@ export default {
 
 .decor2 {
   width: 100px;
-  height: 200px;
+  height: 100px;
   bottom: -10px;
   left: 30px;
+  border: 4px solid white;
 }
 
 @media (min-width: 768px) {
@@ -328,6 +399,62 @@ export default {
   color: var(--dark-gray);
   max-width: 600px;
   margin-bottom: 1rem;
+}
+
+.features-section {
+  padding: 4rem 1rem;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .features-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.feature-card {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.feature-icon {
+  width: 3rem;
+  height: 3rem;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.5rem;
+}
+
+.feature-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--dark-color);
+  margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+  color: var(--dark-gray);
+  font-size: 0.875rem;
 }
 
 /* 热门盲盒区域 */
@@ -396,11 +523,26 @@ export default {
   padding: 1rem;
 }
 
+.box-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--dark-color);
+  margin-bottom: 0.5rem;
+}
+
 .box-price {
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--primary-color);
   margin-bottom: 0.5rem;
+}
+
+.box-popularity {
+  display: flex;
+  align-items: center;
+  color: var(--medium-gray);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
 }
 
 .box-popularity i {
@@ -416,6 +558,7 @@ export default {
   border-radius: 0.5rem;
   padding: 0.5rem;
   font-weight: 500;
+  font-size: large;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
@@ -424,4 +567,59 @@ export default {
   background-color: var(--primary-color-light);
 }
 
+.showcase-section {
+  padding: 4rem 1rem;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .showcase-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .showcase-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.showcase-item {
+  background-color: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.showcase-item:hover {
+  transform: translateY(-5px);
+}
+
+.showcase-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.showcase-info {
+  padding: 1rem;
+}
+
+.showcase-caption {
+  font-size: 0.875rem;
+  color: var(--dark-gray);
+  margin-bottom: 0.5rem;
+}
+
+.showcase-likes i {
+  margin-right: 0.25rem;
+}
 </style>
