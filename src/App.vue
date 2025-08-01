@@ -271,7 +271,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch,provide } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default {
@@ -917,4 +917,5 @@ export default {
 .animate-unbox {
   animation: unbox 1.5s ease-out forwards;
 }
+
 </style>

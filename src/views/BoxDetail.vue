@@ -81,7 +81,7 @@
             class="add-to-cart-btn"
             :disabled="boxInfo.stock <= 0"
           >
-            <i class="fa fa-shopping-cart mr-1"></i> 加入购物车
+            <i class="fa fa-shopping-cart mr-1"></i>
           </button>
           
           <button 
@@ -146,13 +146,16 @@
 <script>
 import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'BoxDetail',
   setup(props, { emit }) {
     const route = useRoute();
     const boxId = route.params.id;
-    
+    const store = useStore();
+    const router = useRouter();
     // 状态管理
     const quantity = ref(1);
     const mainImage = ref('');
@@ -258,6 +261,15 @@ export default {
         price: boxInfo.value.price,
         quantity: quantity.value
       });
+      const product = {
+        id: boxInfo.value.id,
+        name: boxInfo.value.name,
+        price: boxInfo.value.price,
+        image: boxInfo.value.images[0],
+        quantity: quantity.value
+      };
+      store.dispatch('addToCart', product);
+      alert('已加入购物车！');
     };
 
     // 立即购买
@@ -269,6 +281,23 @@ export default {
         price: boxInfo.value.price,
         quantity: quantity.value
       });
+      const product = {
+        id: boxInfo.value.id,
+        name: boxInfo.value.name,
+        price: boxInfo.value.price,
+        image: boxInfo.value.images[0],
+        quantity: quantity.value
+      };
+      
+      const orderData = {
+        items: [product],
+        totalItems: quantity.value,
+        totalAmount: product.price * quantity.value
+      };
+      
+      store.dispatch('createOrder', orderData);
+      store.dispatch('clearCart');
+      router.push('/orders');
     };
 
     // 收藏/取消收藏
@@ -283,7 +312,6 @@ export default {
       fetchBoxDetails();
     });
 
-    // 监听路由变化
     watch(
       () => route.params.id,
       (newId) => {

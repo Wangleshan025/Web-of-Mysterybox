@@ -86,8 +86,9 @@
             <button 
               @click.stop="handleAddToCart(box.id)" 
               class="add-to-cart-btn"
+              style="font-size: x-large;"
             >
-              加入购物车
+              +
             </button>
           </div>
         </div>
