@@ -21,7 +21,7 @@
       </div>
     </section>
 
-    <!-- 特色区域 - 三个模块横向排列 -->
+    <!-- 特色区域 -->
     <section class="features-section">
       <div class="section-header">
         <h2>为什么选择我们</h2>
@@ -328,8 +328,8 @@ export default {
 }
 
 .main-image {
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
   object-fit: cover;
   border-radius: 1rem;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
